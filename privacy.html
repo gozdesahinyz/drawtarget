@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy &amp; Terms — DrawTarget</title>
+<style>
+  /* Matches index.html's committed dark theme, so navigating here from
+     the main site doesn't hand off to a different look. */
+  :root {
+    --bg: #0A1620; --surface: rgba(255, 255, 255, 0.055); --surface-2: rgba(255, 255, 255, 0.09);
+    --text: #F2F7F7; --text-secondary: rgba(242, 247, 247, 0.62); --accent: #5AA3B8;
+    --accent-soft: rgba(90, 163, 184, 0.18); --line: rgba(255, 255, 255, 0.12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+  * { box-sizing: border-box; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  body {
+    margin:0; color: var(--text); font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.65;
+    background:
+      radial-gradient(900px circle at 18% 0%, rgba(90, 163, 184, 0.30), transparent 60%),
+      radial-gradient(700px circle at 90% 10%, rgba(111, 227, 180, 0.16), transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  .page { max-width: 700px; margin: 0 auto; padding: 40px 24px 80px; }
+  nav a { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--text-secondary); text-decoration: none; }
+  h1, h2 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; font-weight: 600; color: var(--text); }
+  h1 { font-size: 26px; margin: 24px 0 4px; }
+  h2 { font-size: 19px; margin: 40px 0 6px; padding-top: 20px; border-top: 1px solid var(--line); }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 32px; }
+  p { max-width: 68ch; color: var(--text); }
+  p.lede { color: var(--text-secondary); font-size: 14.5px; margin: 0 0 28px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-soft);
+    padding: 5px 12px; border-radius: 100px; margin-top: 20px;
+  }
+  .fact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 18px 0 28px; }
+  .fact { background: var(--surface); backdrop-filter: blur(16px); padding: 16px; }
+  .fact .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  .fact .value { font-size: 14.5px; font-weight: 600; margin-top: 4px; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin-bottom: 6px; max-width: 64ch; }
+  .callout { background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; margin: 18px 0; box-shadow: var(--shadow); font-size: 14.5px; }
+  .callout strong { color: var(--accent); }
+  a { color: var(--accent); }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--text-secondary); font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav><a href="index.html">← DrawTarget</a></nav>
+  <span class="badge">Effective 8 October 2026</span>
+  <h1>DrawTarget — Privacy Policy &amp; Terms of Use</h1>
+  <p class="lede">DrawTarget is a UK pension drawdown calculator. This page covers what happens to your data (nothing) and the terms under which you use the app.</p>
+
+  <div class="fact-grid">
+    <div class="fact"><div class="label">Data collected</div><div class="value">None</div></div>
+    <div class="fact"><div class="label">Data sent anywhere</div><div class="value">None</div></div>
+    <div class="fact"><div class="label">Analytics / tracking</div><div class="value">None</div></div>
+    <div class="fact"><div class="label">Account required</div><div class="value">No</div></div>
+  </div>
+
+  <h2>Privacy Policy</h2>
+  <p><strong>DrawTarget does not collect, store, or transmit any personal data.</strong> Everything you type into the app — your income target, pot values, State Pension override — stays on your device only, inside the app's own storage. Nothing is sent to us, to Apple's analytics, or to any third party. The app has no servers of its own. The only network connection it makes is through Apple's own App Store system, to show the price of DrawTarget Pro and to process a purchase or restore if you choose to; that is handled by Apple under <a href="https://www.apple.com/legal/privacy/">Apple's privacy policy</a>, and none of your calculation inputs are part of it.</p>
+
+  <p>Specifically:</p>
+  <ul>
+    <li><strong>No account or sign-in.</strong> The app has no login, so we never see a name, email address, or identity.</li>
+    <li><strong>No analytics or crash reporting SDKs.</strong> We don't know how many people use the app, what they enter, or when it crashes, beyond whatever aggregated, anonymous data Apple itself provides to all developers through App Store Connect.</li>
+    <li><strong>No advertising.</strong> There are no ads and no ad-tracking identifiers.</li>
+    <li><strong>A few small settings are saved on your device</strong> using standard iOS storage (<code>UserDefaults</code>): a custom State Pension amount, if you choose to enter one; a record that you have read the &ldquo;Before you start&rdquo; screen; and, to decide when to show Apple's standard &ldquo;rate this app&rdquo; prompt, how many calculations you have run, the date you first used the app and the app version you were last asked on. None of this leaves your device, and all of it is deleted if you delete the app. The income and pot values you type into a calculation are not saved at all.</li>
+    <li><strong>PDF exports</strong> you choose to share are generated entirely on your device and only go wherever you personally choose to send them (e.g. Mail, Files, AirDrop) via Apple's standard share sheet.</li>
+  </ul>
+
+  <p>Because nothing is collected, the usual data-subject rights under UK GDPR (access, correction, deletion, portability) don't have anything to act on — there is no record of you anywhere for us to show, correct, or delete. If you have any question about this, contact us using the details below.</p>
+
+  <p>If a future version of this app ever changed this — for example, to add optional cloud backup — this policy would be updated first, with a clear description of exactly what changed and why, and the change would need your explicit action to opt in.</p>
+
+  <h2>Terms of Use</h2>
+
+  <p>By downloading, installing, or using DrawTarget, you agree to these Terms of Use. If you don't agree to them, please don't use the app.</p>
+
+  <div class="callout">
+    <strong>This app is not financial advice.</strong> DrawTarget performs illustrative calculations based on the numbers you enter. It never makes a personal recommendation about what you should do with your pension. Under the UK Financial Conduct Authority's advice/guidance boundary, a personal recommendation is "advice" (a regulated activity); showing you a calculation or scenario based on your own inputs is "guidance," which this app stays on the guidance side of. <strong>The developer of DrawTarget is not authorised or regulated by the Financial Conduct Authority</strong>, and nothing in the app is a financial promotion or a recommendation to take out, transfer, or withdraw from any pension product. For a decision about your own retirement, use <a href="https://www.moneyhelper.org.uk/en/pensions-and-retirement/pension-wise">Pension Wise from MoneyHelper</a> (free, impartial and government-backed, for people aged 50 or over with a defined contribution pension) or an FCA-regulated financial adviser. DrawTarget is an independent app: it is not provided by, or connected to, Pension Wise, MoneyHelper, HMRC, the DWP or any part of the UK government.
+  </div>
+
+  <p><strong>A calculator only - what it leaves out.</strong> Results are estimates that depend entirely on what you enter and on simplifying assumptions, which are listed in full inside the app (Settings &rarr; Assumptions &amp; limitations) and printed on every PDF. In particular, the app assumes your only income is the State Pension and your pension withdrawals; it covers defined contribution pensions only; it assumes no investment growth, charges or inflation; and it does not consider inheritance tax, National Insurance or means-tested benefits. It is not designed for people who pay Scottish income tax. You are responsible for checking whether these assumptions fit your circumstances before relying on any figure, and for deciding whether to take guidance or advice.</p>
+
+  <p><strong>Tax year and figures.</strong> Calculations use 2026/27 UK tax year figures for England, Wales, and Northern Ireland only (Scottish tax bands are not currently supported). Figures such as the Personal Allowance, tax thresholds, the Lump Sum Allowance, and the full State Pension amount are set by government policy and change - most reliably every April, sometimes mid-year. We aim to keep these current but do not guarantee they reflect the very latest announcement at every moment; always cross-check anything significant against gov.uk or an adviser before acting on it.</p>
+
+  <p><strong>No warranty, no liability.</strong> The app is provided "as is," without warranty of any kind. We do our best to make the maths correct - it is tested against a validated reference implementation - but we do not guarantee the app is error-free, and to the extent the law allows, we are not liable for any financial decision you make, or loss you suffer, based on its results - because the app is an illustration tool and not advice, any decision remains yours. Nothing in these terms limits liability that cannot legally be limited, and this does not affect any statutory rights you have under UK consumer law that cannot be excluded by agreement, including your rights under the Consumer Rights Act 2015.</p>
+
+  <p><strong>Purchases and your right to cancel.</strong> If you buy DrawTarget or an in-app feature through the App Store, your purchase contract is with Apple, who acts as the retailer (merchant of record) and handles payment, VAT, and refunds under their own terms. Under UK consumer law, you normally have a 14-day right to cancel a digital purchase for any reason - but that right ends as soon as you consent to instant access and acknowledge you're giving up the cancellation period, which is exactly what happens when the App Store delivers a paid download immediately. After that point, your statutory right under the <a href="https://www.legislation.gov.uk/ukpga/2015/15/part/1/chapter/3">Consumer Rights Act 2015</a> is that the digital content must be of satisfactory quality, fit for purpose, and as described - if it isn't, you're entitled to a repair, replacement, or refund. Request this via <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>.</p>
+
+  <p><strong>Changes.</strong> We may update these terms or the privacy policy as the app changes. The effective date at the top of this page will always reflect the latest version.</p>
+
+  <p><strong>Governing law.</strong> These terms are governed by the law of England and Wales.</p>
+
+  <h2>Contact</h2>
+  <p>Questions about privacy or these terms: <a href="mailto:gozdesahinyz@gmail.com">gozdesahinyz@gmail.com</a></p>
+
+  <footer>DrawTarget · com.gozdesahin.DrawTarget · This page is not a substitute for professional legal advice.</footer>
+</div>
+</body>
+</html>

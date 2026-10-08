@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support — DrawTarget</title>
+<style>
+  /* Matches index.html's committed dark theme, so navigating here from
+     the main site doesn't hand off to a different look. */
+  :root {
+    --bg: #0A1620; --surface: rgba(255, 255, 255, 0.055); --surface-2: rgba(255, 255, 255, 0.09);
+    --text: #F2F7F7; --text-secondary: rgba(242, 247, 247, 0.62); --accent: #5AA3B8;
+    --accent-soft: rgba(90, 163, 184, 0.18); --line: rgba(255, 255, 255, 0.12);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+  * { box-sizing: border-box; }
+  a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+  body {
+    margin:0; color: var(--text); font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    font-size: 16px; line-height: 1.65;
+    background:
+      radial-gradient(900px circle at 18% 0%, rgba(90, 163, 184, 0.30), transparent 60%),
+      radial-gradient(700px circle at 90% 10%, rgba(111, 227, 180, 0.16), transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  .page { max-width: 700px; margin: 0 auto; padding: 40px 24px 80px; }
+  nav a { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--text-secondary); text-decoration: none; }
+  h1, h2 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; font-weight: 600; color: var(--text); }
+  h1 { font-size: 26px; margin: 24px 0 4px; }
+  h2 { font-size: 19px; margin: 40px 0 6px; padding-top: 20px; border-top: 1px solid var(--line); }
+  h2:first-of-type { border-top: none; padding-top: 0; margin-top: 32px; }
+  p { max-width: 68ch; color: var(--text); }
+  p.lede { color: var(--text-secondary); font-size: 14.5px; margin: 0 0 28px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; font-weight: 500; color: var(--accent); background: var(--accent-soft);
+    padding: 5px 12px; border-radius: 100px; margin-top: 20px;
+  }
+  .fact-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 18px 0 28px; }
+  .fact { background: var(--surface); backdrop-filter: blur(16px); padding: 16px; }
+  .fact .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  .fact .value { font-size: 14.5px; font-weight: 600; margin-top: 4px; }
+  ul { padding-left: 20px; margin: 10px 0; }
+  li { margin-bottom: 6px; max-width: 64ch; }
+  .callout { background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px; margin: 18px 0; box-shadow: var(--shadow); font-size: 14.5px; }
+  .callout strong { color: var(--accent); }
+  a { color: var(--accent); }
+  footer { margin-top: 56px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--text-secondary); font-family: "IBM Plex Mono", monospace; }
+</style>
+</head>
+<body>
+<div class="page">
+  <nav><a href="index.html">&larr; DrawTarget</a></nav>
+  <h1>DrawTarget — Support</h1>
+  <p class="lede">Questions, problems or feedback about the DrawTarget app.</p>
+
+  <h2>Contact</h2>
+  <p>Email <a href="mailto:gozdesahinyz@gmail.com?subject=DrawTarget%20support">gozdesahinyz@gmail.com</a>. We aim to reply within two working days. You can also tap <strong>Settings &rarr; Contact Support</strong> in the app.</p>
+  <p>We can help with how the app works, the assumptions behind its figures, and purchases. We can't give financial advice about your own situation - for that, use <a href="https://www.moneyhelper.org.uk/en/pensions-and-retirement/pension-wise">Pension Wise from MoneyHelper</a> (free and impartial) or an FCA-regulated financial adviser. DrawTarget is an independent app and is not connected to Pension Wise, MoneyHelper, HMRC, the DWP or the UK government.</p>
+
+  <h2>Common questions</h2>
+  <p><strong>Is the target income before or after tax?</strong> After tax - the amount you want to take home each year. DrawTarget works out the taxable withdrawal and tax behind it.</p>
+  <p><strong>Which tax rules are used?</strong> 2026/27 rates for England, Wales and Northern Ireland. Scottish income tax rates are not supported yet.</p>
+  <p><strong>My State Pension is different from the full rate.</strong> Enter your own figure in Settings; check your forecast on <a href="https://www.gov.uk/check-state-pension">GOV.UK</a>.</p>
+  <p><strong>How do I restore DrawTarget Pro on a new device?</strong> Settings &rarr; Purchases &rarr; Restore Purchase, signed in with the same Apple ID you bought it with.</p>
+  <p><strong>How do I get a refund?</strong> Purchases are handled by Apple. Request a refund at <a href="https://reportaproblem.apple.com">reportaproblem.apple.com</a>.</p>
+  <p><strong>Does the app collect my data?</strong> No. Everything is calculated on your device. See the <a href="privacy.html">Privacy Policy &amp; Terms</a>.</p>
+
+  <footer>DrawTarget · com.gozdesahin.DrawTarget</footer>
+</div>
+</body>
+</html>

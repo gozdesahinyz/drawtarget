@@ -1,0 +1,508 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrawTarget — UK Pension Drawdown Calculator</title>
+<meta name="description" content="Tell DrawTarget the income you need in retirement. It works out what to withdraw, the tax, and how long your pension pot would last with no growth or inflation. A calculator, not financial advice.">
+<style>
+  /* This page deliberately commits to one look - a dark, living
+     gradient behind glass panels - rather than switching with the
+     visitor's light/dark system setting, so the theme started in the
+     hero carries on for the whole scroll instead of handing off to a
+     plain light body partway down. */
+  :root {
+    --bg: #0A1620;
+    --surface: rgba(255, 255, 255, 0.055);
+    --surface-2: rgba(255, 255, 255, 0.09);
+    --text: #F2F7F7;
+    --text-secondary: rgba(242, 247, 247, 0.62);
+    --accent: #5AA3B8;
+    --accent-soft: rgba(90, 163, 184, 0.18);
+    --line: rgba(255, 255, 255, 0.12);
+    --good: #6FE3B4;
+    --good-soft: rgba(111, 227, 180, 0.14);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+  * { box-sizing: border-box; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  a:focus-visible, .btn:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px;
+  }
+  body { margin: 0; color: var(--text); background: var(--bg); font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 16px; line-height: 1.65; }
+
+  /* Aurora background - adapted from 21st.dev's most-bookmarked
+     background component (Aceternity's "Aurora Background"): a pure-CSS
+     technique, no WebGL/canvas - layered gradients, blurred, drifting
+     very slowly (60s per cycle, the same pace as the original), in our
+     own navy/teal/mint palette instead of its default blue/violet.
+     Deliberately calmer than the shader this replaces. */
+  .aurora { position: fixed; inset: 0; z-index: -2; overflow: hidden; pointer-events: none; }
+  .aurora::after {
+    content: ""; position: absolute; inset: -20%;
+    background-image:
+      repeating-linear-gradient(100deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.05) 7%, transparent 10%, transparent 12%, rgba(255,255,255,0.05) 16%),
+      repeating-linear-gradient(100deg, #1E6E7A 6%, #5AA3B8 14%, #0D2430 22%, #6FE3B4 30%, #113C4D 38%);
+    background-size: 300% 200%, 200% 150%;
+    background-position: 50% 50%, 50% 50%;
+    filter: blur(60px);
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse 90% 60% at 30% 0%, black 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 90% 60% at 30% 0%, black 20%, transparent 75%);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .aurora::after { animation: auroraDrift 60s linear infinite; }
+  }
+  @keyframes auroraDrift {
+    from { background-position: 50% 50%, 50% 50%; }
+    to   { background-position: 350% 50%, 350% 50%; }
+  }
+  img, svg { max-width: 100%; }
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; font-weight: 600; color: var(--text); margin: 0; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 88px 0; }
+  section + section { border-top: 1px solid var(--line); }
+
+  /* Top nav */
+  .topnav {
+    position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line);
+  }
+  .topnav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .topnav .wordmark { font-family: "Fraunces", serif; font-weight: 600; font-size: 17px; color: var(--text); text-decoration: none; }
+  .topnav ul { display: flex; gap: 28px; list-style: none; margin: 0; padding: 0; }
+  .topnav a.navlink { color: var(--text-secondary); text-decoration: none; font-size: 14px; }
+  .topnav a.navlink:hover { color: var(--text); }
+  .topnav .navlinks { display: flex; align-items: center; gap: 28px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px; font-family: "IBM Plex Mono", monospace;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.02em; color: var(--accent); background: var(--accent-soft);
+    padding: 6px 14px; border-radius: 100px; margin-bottom: 20px;
+  }
+  p { max-width: 62ch; color: var(--text-secondary); }
+  a { color: var(--accent); }
+
+  /* Hero - the living gradient behind it is now the whole page's fixed
+     background (.aurora, above), so this section only needs its own
+     layout and the one headline accent it's known for. */
+  .hero { padding: 120px 0 96px; }
+  .hero h1 { font-size: clamp(36px, 5vw, 54px); line-height: 1.08; max-width: 16ch; }
+  .hero h1 .accent-text {
+    background: linear-gradient(90deg, #9FD8E8, #6FE3B4);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero .lede { font-size: 19px; max-width: 46ch; margin-top: 20px; }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 56px; align-items: center; }
+  .cta-row { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 15px;
+    padding: 13px 22px; border-radius: 12px; text-decoration: none; white-space: nowrap;
+  }
+  /* Solid white, not the shader's own mint/teal tones - so the button
+     never blends into a bright moment in the moving background behind
+     it. Whatever is flowing back there, this stays legible. */
+  .btn-primary { background: #F2F7F7; color: #0A1620; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); }
+  .btn-ghost { background: rgba(10, 22, 32, 0.55); backdrop-filter: blur(12px); color: var(--text); border: 1px solid rgba(255,255,255,0.28); }
+  .badge-soon {
+    font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--text-secondary);
+    align-self: center;
+  }
+
+  /* Site preview card - this whole block (big light preview canvas, then a
+     meta row, then a solid pill button + a plain icon-text link) is a
+     layout port of 21st.dev's OWN homepage card, not a catalog component:
+     their big white component-preview card sitting on a dark page, the
+     avatar+name+stat row underneath it, and the rounded-pill primary
+     action next to a plain "Save"-style secondary link. */
+  .site-preview { display: flex; flex-direction: column; gap: 16px; }
+  .preview-card {
+    width: 100%; border-radius: 20px; background: #F2F7F7;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 80px -20px rgba(0,0,0,0.5), 0 0 60px -10px rgba(90,163,184,0.35);
+    padding: 22px 20px; display: flex; flex-direction: column; gap: 10px; color: #0A1620;
+  }
+  .preview-card .preview-status { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: #57676C; margin-bottom: 4px; }
+  .preview-card .preview-q { display: block; font-size: 13px; font-weight: 600; color: #57676C; margin-top: 6px; }
+  .preview-card .preview-input-wrap {
+    display: flex; align-items: center; gap: 6px; background: #E7EEEF; border-radius: 10px; padding: 10px 14px;
+  }
+  .preview-card .preview-input-wrap span { font-family: "IBM Plex Mono", monospace; font-size: 18px; color: #57676C; }
+  .preview-card .preview-input {
+    flex: 1; border: none; background: none; outline: none; font-family: "IBM Plex Mono", monospace;
+    font-size: 18px; font-weight: 500; color: #113C4D; min-width: 0;
+  }
+  .preview-card .preview-input::placeholder { color: #9AA7A9; font-weight: 400; }
+  .preview-calc-btn {
+    background: #113C4D; color: #fff; border: none; border-radius: 10px; padding: 11px; font-size: 14px;
+    font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 2px;
+  }
+  .preview-calc-btn:hover { background: #0A2C38; }
+  .preview-pdf-btn {
+    background: none; color: #113C4D; border: 1px solid #C7D3D5; border-radius: 10px; padding: 9px;
+    font-size: 12.5px; font-weight: 600; font-family: inherit; cursor: pointer; margin-top: 2px;
+  }
+  .preview-pdf-btn:hover { background: #E7EEEF; }
+  .preview-card .preview-row { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 11px; background: #EFF3F3; border-radius: 8px; color: #57676C; margin-top: 4px; }
+  .preview-card .preview-row[hidden] { display: none; }
+  .preview-card .preview-row b { color: #0A1620; font-weight: 600; }
+  .preview-card .preview-note { font-size: 11.5px; color: #B06A0A; background: #FBEEDD; border-radius: 8px; padding: 8px 10px; margin: 2px 0 0; max-width: none; }
+  .preview-card .preview-disclaimer { font-size: 10.5px; color: #9AA7A9; margin: 2px 0 0; max-width: none; }
+
+  .preview-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .preview-meta .preview-avatar {
+    width: 30px; height: 30px; border-radius: 8px; background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-family: "IBM Plex Mono", monospace; font-weight: 600; flex-shrink: 0;
+  }
+  .preview-meta .preview-name { font-weight: 600; font-size: 14.5px; }
+  .preview-meta .preview-stat { display: inline-flex; align-items: center; gap: 5px; color: var(--text-secondary); font-size: 13px; }
+
+  .preview-actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .pill-btn {
+    display: inline-flex; align-items: center; gap: 8px; background: var(--accent); color: #fff;
+    font-weight: 600; font-size: 14px; padding: 11px 22px; border-radius: 999px; text-decoration: none;
+  }
+  .ghost-link { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 14px; text-decoration: none; }
+  .ghost-link:hover { color: var(--text); }
+
+  /* Problem/solution */
+  .compare-old {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line);
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-top: 32px;
+  }
+  .compare-old > div { background: var(--surface); backdrop-filter: blur(16px); padding: 24px; }
+  .compare-old .tag { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  .compare-old .q { font-size: 18px; font-weight: 600; margin: 8px 0 0; font-family: "Fraunces", serif; }
+  .compare-old .yes .tag { color: var(--good); }
+
+  /* Feature grid - adapted from Magic UI's Bento Grid (magicuidesign/magicui,
+     registry/magicui/bento-grid.tsx): asymmetric tiles, content shifts up on
+     hover to reveal a link underneath, glowing inset border. Ported from
+     Tailwind/React to plain CSS; kept the actual technique (the hover
+     transform + the inset box-shadow glow), not just its look. */
+  .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-auto-rows: 224px; gap: 16px; margin-top: 36px; }
+  .bento-card {
+    grid-column: span 1; position: relative; overflow: hidden; border-radius: 14px;
+    background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--line);
+    padding: 24px; display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .bento-card::before {
+    content: ""; position: absolute; inset: 0; border-radius: 14px; pointer-events: none;
+    box-shadow: inset 0 -70px 70px -30px rgba(255,255,255,0.05);
+  }
+  .bento-card.span-2 { grid-column: span 2; }
+  .bento-card .icon { width: 34px; height: 34px; border-radius: 9px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 16px; margin-bottom: 14px; font-family: "IBM Plex Mono", monospace; font-weight: 600; flex-shrink: 0; }
+  .bento-card .content { transition: transform 0.3s ease; }
+  .bento-card:hover .content { transform: translateY(-30px); }
+  .bento-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .bento-card p { font-size: 13.5px; margin: 0; }
+  .bento-card .cta {
+    position: absolute; left: 24px; bottom: 24px; font-size: 12.5px; font-weight: 600;
+    text-decoration: none; opacity: 0; transform: translateY(8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .bento-card:hover .cta { opacity: 1; transform: translateY(0); }
+
+  /* Sample result stat cards - ported from shadcn/ui's own official
+     dashboard example (shadcn-ui/ui, apps/www/app/examples/dashboard/
+     page.tsx: the "Total Revenue" Card/CardHeader/CardContent pattern),
+     fetched straight from GitHub since it's MIT-licensed and free. */
+  .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 36px; }
+  .stat-card { background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .stat-card .stat-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .stat-card .stat-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+  .stat-card .stat-icon { font-family: "IBM Plex Mono", monospace; font-size: 14px; color: var(--text-secondary); }
+  .stat-card .stat-value { font-family: "Fraunces", serif; font-size: 26px; font-weight: 600; }
+  .stat-card .stat-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+  /* Pricing */
+  .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; margin-top: 36px; max-width: 560px; }
+  .price-card { background: var(--surface); backdrop-filter: blur(16px); padding: 26px 22px; }
+  .price-card.us { background: var(--accent); backdrop-filter: none; }
+  .price-card.us * { color: white !important; }
+  .price-card .name { font-family: "IBM Plex Mono", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+  .price-card .amount { font-family: "Fraunces", serif; font-size: 30px; font-weight: 600; margin: 8px 0 2px; }
+  .price-card .cadence { font-size: 12.5px; color: var(--text-secondary); }
+  .price-card ul { list-style: none; padding: 0; margin: 18px 0 0; font-size: 13.5px; }
+  .price-card li { padding: 5px 0; color: var(--text-secondary); }
+  .price-card.us .cadence, .price-card.us li, .price-card.us .name { color: rgba(255,255,255,0.82) !important; }
+
+  /* Privacy strip */
+  .privacy-strip { display: flex; gap: 24px; align-items: center; background: var(--good-soft); backdrop-filter: blur(16px); border: 1px solid var(--line); border-radius: 14px; padding: 24px 28px; margin-top: 36px; }
+  .privacy-strip .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--good); flex-shrink: 0; }
+
+  footer { padding: 48px 0; }
+  .foot-grid { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .foot-links { display: flex; gap: 20px; font-size: 13.5px; }
+  .foot-links a { color: var(--text-secondary); text-decoration: none; }
+  .foot-brand { font-family: "IBM Plex Mono", monospace; font-size: 12.5px; color: var(--text-secondary); }
+
+  @media (max-width: 760px) {
+    .hero-grid, .compare-old, .price-grid, .bento-grid, .stat-grid { grid-template-columns: 1fr; }
+    .bento-card, .bento-card.span-2 { grid-column: span 1; }
+    .bento-grid { grid-auto-rows: auto; }
+    .bento-card { min-height: 200px; }
+    .bento-card:hover .content { transform: none; }
+    .bento-card .cta { position: static; opacity: 1; transform: none; display: inline-block; margin-top: 12px; }
+    section { padding: 56px 0; }
+  }
+  @media (max-width: 480px) {
+    .topnav ul { gap: 16px; }
+    .topnav .navlink.hide-xs { display: none; }
+  }
+
+  /* Scroll reveal - only takes effect once JS confirms it can animate
+     smoothly; without JS, or with reduced motion, content is just visible. */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+  .js .reveal.in-view { opacity: 1; transform: none; }
+</style>
+</head>
+<body>
+
+<div class="aurora" aria-hidden="true"></div>
+
+<header class="topnav">
+  <div class="wrap">
+    <a class="wordmark" href="#top">DrawTarget</a>
+    <div class="navlinks">
+      <ul>
+        <li><a class="navlink hide-xs" href="#features">Features</a></li>
+        <li><a class="navlink" href="#pricing">Pricing</a></li>
+        <li><a class="navlink" href="privacy.html">Privacy</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">UK · Defined Contribution Pensions</span>
+      <h1>Tell us the income you need. We'll work out the <span class="accent-text">withdrawal.</span></h1>
+      <p class="lede">DrawTarget is a UK pension drawdown calculator that works backwards from your target retirement income — not forwards from a withdrawal percentage you're supposed to already know.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#pricing">See pricing</a>
+        <a class="btn btn-ghost" href="#how-it-works">How it works</a>
+        <span class="badge-soon">Coming soon to the App Store</span>
+      </div>
+    </div>
+    <div class="site-preview">
+      <div class="preview-card">
+        <div class="preview-status">DrawTarget · try it free, no download</div>
+        <label class="preview-q" for="calcIncome">How much income do you need a year, after tax?</label>
+        <div class="preview-input-wrap">
+          <span>£</span>
+          <input class="preview-input" id="calcIncome" inputmode="numeric" autocomplete="off" value="25,000">
+        </div>
+        <label class="preview-q" for="calcPot">Your pension pot (optional)</label>
+        <div class="preview-input-wrap">
+          <span>£</span>
+          <input class="preview-input" id="calcPot" inputmode="numeric" autocomplete="off" placeholder="e.g. 150,000">
+        </div>
+        <button class="preview-calc-btn" id="calcButton" type="button">Calculate</button>
+        <div class="preview-row"><span>Estimated net income</span><b id="resultNet">£0</b></div>
+        <div class="preview-row"><span>Required withdrawal</span><b id="resultWithdrawal">£0</b></div>
+        <div class="preview-row" id="resultPclsRow" hidden><span>Tax-free lump sum</span><b id="resultPcls">£0</b></div>
+        <p class="preview-note" id="resultNote" hidden></p>
+        <p class="preview-disclaimer">Calculator only - not financial advice. Illustrative estimates using 2026/27 rates for England, Wales &amp; NI, assuming no other income, no growth and no inflation. The developer is not FCA-authorised, and DrawTarget is not connected to Pension Wise, MoneyHelper or the UK government. <a href="privacy.html">Full terms</a>.</p>
+      </div>
+      <div class="preview-meta">
+        <div class="preview-avatar">£</div>
+        <div class="preview-name">DrawTarget</div>
+        <span class="preview-stat">🔒 On-device only</span>
+        <span class="preview-stat">£0 to start</span>
+      </div>
+      <div class="preview-actions">
+        <a class="pill-btn" href="#pricing">See pricing</a>
+        <a class="ghost-link" href="#how-it-works">🔖 How it works</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how-it-works">
+  <div class="wrap reveal">
+    <span class="eyebrow">The problem</span>
+    <h2 style="font-size:28px; max-width:28ch;">Most drawdown calculators ask the wrong question first.</h2>
+    <div class="compare-old">
+      <div>
+        <div class="tag">The usual way</div>
+        <div class="q">"What withdrawal rate do you want — 3%? 4%?"</div>
+        <p style="margin-top:12px;">A question most people approaching retirement can't actually answer, because it isn't how they think about their own money.</p>
+      </div>
+      <div class="yes">
+        <div class="tag">DrawTarget's way</div>
+        <div class="q">"How much income do you need this year?"</div>
+        <p style="margin-top:12px;">A question anyone can answer immediately. We work backwards from there — the withdrawal, the tax, the tax-free lump sum, and how long the pot lasts follow automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sample-result">
+  <div class="wrap reveal">
+    <span class="eyebrow">A real example</span>
+    <h2 style="font-size:28px; max-width:26ch;">Someone who needs £25,000 a year sees this.</h2>
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Estimated Net Income</span>
+          <span class="stat-icon">£</span>
+        </div>
+        <div class="stat-value" data-ticker="25000">£25,000</div>
+        <p class="stat-note">Matches the target exactly</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Required Withdrawal</span>
+          <span class="stat-icon">↓</span>
+        </div>
+        <div class="stat-value" data-ticker="27430">£27,430</div>
+        <p class="stat-note">Gross, before tax</p>
+      </div>
+      <div class="stat-card">
+        <div class="stat-header">
+          <span class="stat-title">Tax-Free Lump Sum</span>
+          <span class="stat-icon">%</span>
+        </div>
+        <div class="stat-value" data-ticker="31250">£31,250</div>
+        <p class="stat-note">25% of this pot, tax-free</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap reveal">
+    <span class="eyebrow">What it works out for you</span>
+    <h2 style="font-size:28px; max-width:26ch;">Every UK-specific detail, handled correctly.</h2>
+    <div class="bento-grid">
+      <div class="bento-card span-2">
+        <div class="content">
+          <div class="icon">£</div>
+          <h3>Income tax, done right</h3>
+          <p>2026/27 UK tax bands — Personal Allowance, basic, higher and additional rate — applied automatically to work out your gross withdrawal from a net target.</p>
+        </div>
+        <a class="cta" href="#top" style="color: var(--good);">Included free →</a>
+      </div>
+      <div class="bento-card">
+        <div class="content">
+          <div class="icon">%</div>
+          <h3>Tax-free lump sum (PCLS)</h3>
+          <p>25% of each pot, correctly capped against the £268,275 Lump Sum Allowance across all your pensions combined.</p>
+        </div>
+        <a class="cta" href="#top" style="color: var(--good);">Included free →</a>
+      </div>
+      <div class="bento-card">
+        <div class="content">
+          <div class="icon">⚠</div>
+          <h3>MPAA &amp; Month-1 warnings</h3>
+          <p>Flags the irreversible drop in your annual contribution limit, and the emergency-tax risk on your very first withdrawal — before you're caught out by either.</p>
+        </div>
+        <a class="cta" href="#top" style="color: var(--good);">Included free →</a>
+      </div>
+      <div class="bento-card span-2">
+        <div class="content">
+          <div class="icon">+</div>
+          <h3>Multiple pots</h3>
+          <p>Most people approaching retirement have more than one pension pot from different employers. Add them all and see one combined result.</p>
+        </div>
+        <a class="cta" href="#pricing" style="color: var(--accent);">Unlock with Pro →</a>
+      </div>
+      <div class="bento-card span-2">
+        <div class="content">
+          <div class="icon">▤</div>
+          <h3>PDF summary</h3>
+          <p>A clean, shareable summary you can save, send to a partner, or bring to an FCA-regulated adviser.</p>
+        </div>
+        <a class="cta" href="#pricing" style="color: var(--accent);">Unlock with Pro →</a>
+      </div>
+      <div class="bento-card">
+        <div class="content">
+          <div class="icon">⇄</div>
+          <h3>Scenario comparison</h3>
+          <p>Compare two or three income targets side by side, so "what if I needed a bit more?" has an actual answer.</p>
+        </div>
+        <a class="cta" href="#pricing" style="color: var(--accent);">Unlock with Pro →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap reveal">
+    <span class="eyebrow">Pricing</span>
+    <h2 style="font-size:28px; max-width:24ch;">Pay once. Own it. No subscription, ever.</h2>
+    <p style="margin-top:12px;">Some retirement planning apps charge a monthly fee that adds up to more than the app itself is worth in a year. DrawTarget doesn't.</p>
+    <div class="price-grid">
+      <div class="price-card">
+        <div class="name">DrawTarget Free</div>
+        <div class="amount">£0</div>
+        <div class="cadence">no card, no account</div>
+        <ul>
+          <li>Single pot calculation</li>
+          <li>Full tax &amp; PCLS logic</li>
+          <li>MPAA &amp; Month-1 warnings</li>
+        </ul>
+      </div>
+      <div class="price-card us">
+        <div class="name">DrawTarget Pro</div>
+        <div class="amount">£12.99</div>
+        <div class="cadence">one-time, forever</div>
+        <ul>
+          <li>Multiple pots</li>
+          <li>PDF export</li>
+          <li>Scenario comparison</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap reveal">
+    <span class="eyebrow">Privacy</span>
+    <div class="privacy-strip">
+      <div class="dot"></div>
+      <p style="margin:0; color:var(--text);"><strong>Nothing you type ever leaves your device.</strong> No account, no sign-up, no analytics, no ad tracking. Every calculation happens entirely on-device — DrawTarget makes no network connections at all.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-brand">DrawTarget · com.gozdesahin.DrawTarget</div>
+    <div class="foot-links">
+      <a href="privacy.html">Privacy &amp; Terms</a>
+      <a href="support.html">Support</a>
+      <a href="mailto:gozdesahinyz@gmail.com">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Scroll-reveal for below-the-fold sections only. Runs only when JS is
+  // available and the visitor hasn't asked for reduced motion - otherwise
+  // the .reveal CSS rule above never applies, so content stays visible.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('js');
+    var targets = document.querySelectorAll('.reveal');
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    targets.forEach(function (el) { io.observe(el); });
+  }
+</script>
+<script src="number-ticker.js"></script>
+<script src="calculator-engine.js"></script>
+<script src="calculator-ui.js"></script>
+
+</body>
+</html>
